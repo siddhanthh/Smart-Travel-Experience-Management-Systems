@@ -8,6 +8,8 @@ const authRoutes = require('./routes/authRoutes');
 const tripRoutes = require('./routes/tripRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
 const feedRoutes = require('./routes/feedRoutes');
+const expensRoutes = require('./routes/expenseRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 
 const app = express();
 
@@ -27,6 +29,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/trips',tripRoutes);
 app.use('/api/bookings',bookingRoutes);
 app.use('/api/feed', feedRoutes);
+app.use('/api/expenser', expensRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Health Check Route
 app.get('/health', (req, res) => {
