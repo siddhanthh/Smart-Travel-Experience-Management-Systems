@@ -4,6 +4,7 @@ const cors = require('cors');
 const morgan = require('morgan');
 const { errorHandler } = require('./middleware/errorHandler');
 const authRoutes = require('./routes/authRoutes');
+const tripRoutes = require('./routes/tripRoutes');
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use(cors({
 }));
 
 app.use('/api/auth', authRoutes);
+app.use('/api/trips',tripRoutes);
 
 // Health Check Route
 app.get('/health', (req, res) => {
