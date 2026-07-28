@@ -3,8 +3,10 @@ const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const morgan = require('morgan');
 const { errorHandler } = require('./middleware/errorHandler');
+
 const authRoutes = require('./routes/authRoutes');
 const tripRoutes = require('./routes/tripRoutes');
+const bookingRoutes = require('./routes/bookingRoutes');
 
 const app = express();
 
@@ -20,6 +22,7 @@ app.use(cors({
 
 app.use('/api/auth', authRoutes);
 app.use('/api/trips',tripRoutes);
+app.use('/api/bookings',bookingRoutes);
 
 // Health Check Route
 app.get('/health', (req, res) => {
