@@ -1,0 +1,29 @@
+# ── Dependencies (NEVER commit these — they're huge) ──
+node_modules/
+
+# ── Environment variables (NEVER commit — contains passwords!) ──
+.env
+
+# ── Build output ──
+dist/
+build/
+
+# ── Uploaded files ──
+uploads/
+
+# ── OS junk files ──
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── IDE config ──
+.vscode/
+.idea/
+
+# ── Logs ──
+*.log
+npm-debug.log*
+
+# ── Coverage reports ──
+coverage/
+IMPLEMENTATION_PLAN.md
