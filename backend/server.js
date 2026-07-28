@@ -1,11 +1,27 @@
-const express = require('express');
-const app = express();
-const PORT = 3000;
+const app = require('./app');
+const connectMongo = require('./config/db.mongo');
+const pool = require('./config/db.mysql');
+require('dotenv').config();
 
-app.get("/",(req, res)=> {
-    res.send("");
-});
+const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-    console.log("Server up")
-})
+const startServer = async () => {
+  try {
+    // Test MySQL Connection
+    const connection = await pool.getConnection();
+    console.log('MySQL Connected successfully.');
+    connection.release();
+
+    // Connect MongoDB
+    await connectMongo();
+
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error('Failed to initialize server:', error.message);
+    process.exit(1);
+  }
+};
+
+startServer();
