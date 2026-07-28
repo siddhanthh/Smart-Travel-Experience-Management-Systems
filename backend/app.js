@@ -10,6 +10,8 @@ const bookingRoutes = require('./routes/bookingRoutes');
 const feedRoutes = require('./routes/feedRoutes');
 const expensRoutes = require('./routes/expenseRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const searchRoutes = require('./routes/searchRoutes');
+const swaggerSpec = require('./config/swagger');
 
 const app = express();
 
@@ -25,12 +27,15 @@ app.use(cors({
 
 app.use('/uploads',express.static(path.join(__dirname,'uploads')));
 
+app.use('/api-docs',swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 app.use('/api/auth', authRoutes);
 app.use('/api/trips',tripRoutes);
 app.use('/api/bookings',bookingRoutes);
 app.use('/api/feed', feedRoutes);
 app.use('/api/expenser', expensRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/search',searchRoutes);
 
 // Health Check Route
 app.get('/health', (req, res) => {
