@@ -1,0 +1,113 @@
+const Post = require('../models/Post');
+const Comment = require('../models/Comment');
+const Reaction = require('../models/Reaction');
+const mongoose = require('mongoose');
+const pool = require('../config/db.mysql');
+const { AppError } = require('../middleware/errorHandler');
+
+exports.createPost = async ({ tripId, userId, content, files }) => {
+  const imageUrls = files ? files.map((file) => `/uploads/${file.filename}`) : [];
+
+  const post = await Post.create({
+    tripId: Number(tripId),
+    userId,
+    content,
+    images: imageUrls
+  });
+
+  return post;
+};
+
+// MongoDB Aggregation Pipeline to join comments and reactions
+exports.getTripFeed = async (tripId, { page = 1, limit = 10 }) => {
+  const skip = (Number(page) - 1) * Number(limit);
+
+  const posts = await Post.aggregate([
+    { $match: { tripId: Number(tripId) } },
+    { $sort: { createdAt: -1 } },
+    { $skip: skip },
+    { $limit: Number(limit) },
+    // Join comments
+    {
+      $lookup: {
+        from: 'comments',
+        localField: '_id',
+        foreignField: 'postId',
+        as: 'comments'
+      }
+    },
+    // Join reactions
+    {
+      $lookup: {
+        from: 'reactions',
+        localField: '_id',
+        foreignField: 'postId',
+        as: 'reactions'
+      }
+    },
+    // Add computed fields
+    {
+      $addFields: {
+        commentCount: { $size: '$comments' },
+        reactionCount: { $size: '$reactions' }
+      }
+    },
+    // Exclude raw arrays to optimize payload size
+    { $project: { comments: 0, reactions: 0 } }
+  ]);
+
+  // Hydrate user profile names from MySQL
+  const userIds = [...new Set(posts.map((p) => p.userId))];
+  let userMap = {};
+
+  if (userIds.length > 0) {
+    const [users] = await pool.query(
+      `SELECT id, name FROM users WHERE id IN (${userIds.map(() => '?').join(',')})`,
+      userIds
+    );
+    users.forEach((u) => {
+      userMap[u.id] = u.name;
+    });
+  }
+
+  const enrichedPosts = posts.map((post) => ({
+    ...post,
+    authorName: userMap[post.userId] || 'Unknown User'
+  }));
+
+  return enrichedPosts;
+};
+
+exports.addComment = async (postId, userId, content) => {
+  const post = await Post.findById(postId);
+  if (!post) throw new AppError('Post not found', 404);
+
+  const comment = await Comment.create({
+    postId: new mongoose.Types.ObjectId(postId),
+    userId,
+    content
+  });
+
+  return comment;
+};
+
+exports.toggleReaction = async (postId, userId) => {
+  const post = await Post.findById(postId);
+  if (!post) throw new AppError('Post not found', 404);
+
+  const existing = await Reaction.findOne({
+    postId: new mongoose.Types.ObjectId(postId),
+    userId
+  });
+
+  if (existing) {
+    await Reaction.findByIdAndDelete(existing._id);
+    return { message: 'Reaction removed', reacted: false };
+  } else {
+    await Reaction.create({
+      postId: new mongoose.Types.ObjectId(postId),
+      userId
+    });
+    return { message: 'Reaction added', reacted: true };
+  }
+};

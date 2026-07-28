@@ -7,6 +7,7 @@ const { errorHandler } = require('./middleware/errorHandler');
 const authRoutes = require('./routes/authRoutes');
 const tripRoutes = require('./routes/tripRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
+const feedRoutes = require('./routes/feedRoutes');
 
 const app = express();
 
@@ -20,9 +21,12 @@ app.use(cors({
   credentials: true
 }));
 
+app.use('/uploads',express.static(path.join(__dirname,'uploads')));
+
 app.use('/api/auth', authRoutes);
 app.use('/api/trips',tripRoutes);
 app.use('/api/bookings',bookingRoutes);
+app.use('/api/feed', feedRoutes);
 
 // Health Check Route
 app.get('/health', (req, res) => {
