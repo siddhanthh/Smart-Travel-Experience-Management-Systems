@@ -1,4 +1,6 @@
 const express = require('express');
+const path = require('path');
+const swaggerUi = require('swagger-ui-express');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const morgan = require('morgan');
@@ -33,7 +35,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/trips',tripRoutes);
 app.use('/api/bookings',bookingRoutes);
 app.use('/api/feed', feedRoutes);
-app.use('/api/expenser', expensRoutes);
+app.use('/api/expenses', expensRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/search',searchRoutes);
 
