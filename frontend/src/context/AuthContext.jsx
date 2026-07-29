@@ -12,20 +12,20 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     authService
       .me()
-      .then((data) => setUser(data.user ?? data))
+      .then((data) => setUser(data.data ?? data.user ?? data))
       .catch(() => setUser(null))
       .finally(() => setLoading(false));
   }, []);
 
   const login = useCallback(async (credentials) => {
     const data = await authService.login(credentials);
-    setUser(data.user ?? data);
+    setUser(data.data ?? data.user ?? data);
     return data;
   }, []);
 
   const register = useCallback(async (payload) => {
     const data = await authService.register(payload);
-    setUser(data.user ?? data);
+    setUser(data.data ?? data.user ?? data);
     return data;
   }, []);
 
