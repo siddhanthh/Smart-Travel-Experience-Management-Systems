@@ -14,7 +14,8 @@ export default function SearchPage() {
     setLoading(true);
     try {
       const data = mode === 'trips' ? await searchService.trips(q) : await searchService.users(q);
-      setResults(data.results ?? data.trips ?? data.users ?? data);
+      const raw = data.data ?? data.results ?? data.trips ?? data.users ?? data;
+      setResults(Array.isArray(raw) ? raw : []);
     } finally {
       setLoading(false);
     }

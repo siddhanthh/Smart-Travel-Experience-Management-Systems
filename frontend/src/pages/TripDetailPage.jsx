@@ -18,8 +18,9 @@ export default function TripDetailPage() {
     setLoading(true);
     Promise.all([tripService.getById(id), tripService.members(id)])
       .then(([tripData, memberData]) => {
-        setTrip(tripData.trip ?? tripData);
-        setMembers(memberData.members ?? memberData);
+        const rawMembers = memberData.data ?? memberData.members ?? memberData;
+        setTrip(tripData.data ?? tripData.trip ?? tripData);
+        setMembers(Array.isArray(rawMembers) ? rawMembers : []);
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));

@@ -20,8 +20,9 @@ export default function BookingsPage() {
     setLoading(true);
     Promise.all([bookingService.listForTrip(tripId), tripService.getById(tripId)])
       .then(([bookingData, tripData]) => {
-        setBookings(bookingData.bookings ?? bookingData);
-        setTrip(tripData.trip ?? tripData);
+        const rawBookings = bookingData.data ?? bookingData.bookings ?? bookingData;
+        setBookings(Array.isArray(rawBookings) ? rawBookings : []);
+        setTrip(tripData.data ?? tripData.trip ?? tripData);
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));

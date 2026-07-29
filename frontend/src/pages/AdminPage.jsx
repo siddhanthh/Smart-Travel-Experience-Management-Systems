@@ -19,9 +19,11 @@ export default function AdminPage() {
     setLoading(true);
     Promise.all([adminService.stats(), adminService.listUsers(), adminService.auditLogs()])
       .then(([statData, userData, auditData]) => {
-        setStats(statData);
-        setUsers(userData.users ?? userData.data ?? userData);
-        setAuditLogs(auditData.logs ?? auditData.data ?? auditData);
+        setStats(statData.data ?? statData);
+        const rawUsers = userData.data ?? userData.users ?? userData;
+        const rawAudit = auditData.data ?? auditData.logs ?? auditData;
+        setUsers(Array.isArray(rawUsers) ? rawUsers : []);
+        setAuditLogs(Array.isArray(rawAudit) ? rawAudit : []);
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));

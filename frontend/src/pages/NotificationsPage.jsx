@@ -15,8 +15,9 @@ export default function NotificationsPage() {
     notificationService
       .list({ page, limit })
       .then((data) => {
-        setNotifications(data.notifications ?? data.data ?? data);
-        setTotalPages(data.totalPages ?? 1);
+        const rawNotifs = data.data ?? data.notifications ?? data;
+        setNotifications(Array.isArray(rawNotifs) ? rawNotifs : []);
+        setTotalPages(data.pagination?.totalPages ?? data.totalPages ?? 1);
       })
       .finally(() => setLoading(false));
   }

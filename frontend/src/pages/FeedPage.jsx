@@ -20,8 +20,9 @@ export default function FeedPage() {
     setLoading(true);
     Promise.all([feedService.getFeedForTrip(tripId), tripService.getById(tripId)])
       .then(([feedData, tripData]) => {
-        setPosts(feedData.posts ?? feedData);
-        setTrip(tripData.trip ?? tripData);
+        const rawPosts = feedData.data ?? feedData.posts ?? feedData;
+        setPosts(Array.isArray(rawPosts) ? rawPosts : []);
+        setTrip(tripData.data ?? tripData.trip ?? tripData);
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));

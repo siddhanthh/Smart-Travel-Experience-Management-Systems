@@ -29,10 +29,13 @@ export default function ExpensesPage() {
       tripService.getById(tripId),
     ])
       .then(([expenseData, balanceData, memberData, tripData]) => {
-        setExpenses(expenseData.expenses ?? expenseData);
-        setBalances(balanceData.balances ?? balanceData);
-        setMembers(memberData.members ?? memberData);
-        setTrip(tripData.trip ?? tripData);
+        const rawExpenses = expenseData.data ?? expenseData.expenses ?? expenseData;
+        const rawBalances = balanceData.data ?? balanceData.balances ?? balanceData;
+        const rawMembers = memberData.data ?? memberData.members ?? memberData;
+        setExpenses(Array.isArray(rawExpenses) ? rawExpenses : []);
+        setBalances(Array.isArray(rawBalances) ? rawBalances : []);
+        setMembers(Array.isArray(rawMembers) ? rawMembers : []);
+        setTrip(tripData.data ?? tripData.trip ?? tripData);
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));

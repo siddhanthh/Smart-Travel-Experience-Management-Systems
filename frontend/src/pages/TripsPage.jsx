@@ -22,8 +22,9 @@ export default function TripsPage() {
     tripService
       .list({ page, limit })
       .then((data) => {
-        setTrips(data.trips ?? data.data ?? data);
-        setTotalPages(data.totalPages ?? 1);
+        const rawTrips = data.data ?? data.trips ?? data;
+        setTrips(Array.isArray(rawTrips) ? rawTrips : []);
+        setTotalPages(data.pagination?.totalPages ?? data.totalPages ?? 1);
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
