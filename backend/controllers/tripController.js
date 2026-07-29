@@ -71,3 +71,12 @@ exports.deleteTrip = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.leaveTrip = async (req, res, next) => {
+  try {
+    const result = await tripService.leaveTrip(req.params.id, req.user.id);
+    res.status(200).json(result);
+  } catch (err) {
+    next(err);
+  }
+};

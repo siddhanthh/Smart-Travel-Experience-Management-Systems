@@ -233,3 +233,23 @@ exports.deleteTrip = async (tripId, userId, userRole) => {
   await pool.query('DELETE FROM trips WHERE id = ?', [tripId]);
   return { message: 'Trip deleted successfully' };
 };
+
+exports.leaveTrip = async (tripId, userId) => {
+  const [trips] = await pool.query('SELECT created_by FROM trips WHERE id = ?', [tripId]);
+  if (trips.length === 0) throw new AppError('Trip not found', 404);
+
+  if (Number(trips[0].created_by) === Number(userId)) {
+    throw new AppError('The trip organizer cannot leave the trip. You can cancel or delete the trip instead.', 400);
+  }
+
+  const [result] = await pool.query(
+    'DELETE FROM trip_members WHERE trip_id = ? AND user_id = ?',
+    [tripId, userId]
+  );
+
+  if (result.affectedRows === 0) {
+    throw new AppError('You are not a member of this trip.', 400);
+  }
+
+  return { message: 'Successfully left the trip' };
+};

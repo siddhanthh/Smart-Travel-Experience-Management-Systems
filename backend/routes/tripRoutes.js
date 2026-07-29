@@ -167,4 +167,24 @@ router.post('/:id/join', tripController.joinTrip);
  */
 router.put('/:id/cancel', tripController.cancelTrip);
 
+/**
+ * @openapi
+ * /trips/{id}/leave:
+ *   post:
+ *     summary: Leave a trip
+ *     tags: [Trips]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Successfully left trip
+ */
+router.post('/:id/leave', tripController.leaveTrip);
+
 module.exports = router;
