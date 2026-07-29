@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./config/swagger');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const morgan = require('morgan');
@@ -13,7 +14,7 @@ const feedRoutes = require('./routes/feedRoutes');
 const expensRoutes = require('./routes/expenseRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const searchRoutes = require('./routes/searchRoutes');
-const swaggerSpec = require('./config/swagger');
+const notificationRoutes= require('./routes/notificationRoutes');
 
 const app = express();
 
@@ -38,6 +39,7 @@ app.use('/api/feed', feedRoutes);
 app.use('/api/expenses', expensRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/search',searchRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // Health Check Route
 app.get('/health', (req, res) => {
