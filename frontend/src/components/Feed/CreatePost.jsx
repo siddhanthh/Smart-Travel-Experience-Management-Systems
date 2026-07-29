@@ -60,7 +60,7 @@ export default function CreatePost({ tripId: propTripId, onPosted }) {
           >
             {myTrips.map((t) => (
               <option key={t.id} value={t.id}>
-                📍 {t.title} ({t.destination})
+                {t.title} ({t.destination})
               </option>
             ))}
           </select>
@@ -70,7 +70,7 @@ export default function CreatePost({ tripId: propTripId, onPosted }) {
         rows={3}
         value={content}
         onChange={(e) => setContent(e.target.value)}
-        placeholder="Share a photo or memory from your trip… 📸"
+        placeholder="Share a photo or memory from your trip..."
         className="w-full resize-none rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
       />
       <div className="mt-2 flex flex-wrap items-center justify-between gap-2">

@@ -1,13 +1,20 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { expenseService } from '../../services/expenseService';
 import ErrorMessage from '../Common/ErrorMessage';
 
-export default function AddExpense({ tripId, members = [], onAdded }) {
-  const [title, setTitle] = useState('');
-  const [amount, setAmount] = useState('');
+export default function AddExpense({ tripId, members = [], onAdded, prefill, onClearPrefill }) {
+  const [title, setTitle] = useState(prefill?.title || '');
+  const [amount, setAmount] = useState(prefill?.amount || '');
   const [splitAmong, setSplitAmong] = useState(members.map((m) => m.user_id));
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (prefill) {
+      if (prefill.title) setTitle(prefill.title);
+      if (prefill.amount) setAmount(prefill.amount);
+    }
+  }, [prefill]);
 
   function toggleMember(id) {
     setSplitAmong((prev) => (prev.includes(id) ? prev.filter((m) => m !== id) : [...prev, id]));
@@ -26,6 +33,7 @@ export default function AddExpense({ tripId, members = [], onAdded }) {
       });
       setTitle('');
       setAmount('');
+      onClearPrefill?.();
       onAdded?.(expense);
     } catch (err) {
       setError(err.message);

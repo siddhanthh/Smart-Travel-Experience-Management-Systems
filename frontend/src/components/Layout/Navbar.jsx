@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { notificationService } from '../../services/notificationService';
@@ -17,7 +17,7 @@ export default function Navbar() {
         .catch(() => {});
     }
     checkUnread();
-    const interval = setInterval(checkUnread, 5000); // Live poll every 5 seconds
+    const interval = setInterval(checkUnread, 5000);
     return () => clearInterval(interval);
   }, [user]);
 
@@ -26,49 +26,70 @@ export default function Navbar() {
     navigate('/login');
   }
 
+  const linkClass = ({ isActive }) =>
+    `text-sm font-semibold transition ${
+      isActive ? 'text-blue-600 border-b-2 border-blue-600 pb-0.5' : 'text-slate-600 hover:text-blue-600'
+    }`;
+
   return (
-    <nav className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur">
+    <nav className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-        <Link to="/" className="text-lg font-bold text-blue-600">
-          STEMS
-        </Link>
-        {user && (
-          <div className="hidden items-center gap-5 text-sm font-medium text-slate-600 md:flex">
-            <Link to="/feed" className="hover:text-blue-600">Feed</Link>
-            <Link to="/trips" className="hover:text-blue-600">Trips</Link>
-            <Link to="/search" className="hover:text-blue-600">Search</Link>
-            <Link to="/notifications" className="relative hover:text-blue-600">
-              Notifications
-              {unread > 0 && (
-                <span className="absolute -right-3 -top-2 rounded-full bg-red-500 px-1.5 text-[10px] font-semibold text-white">
-                  {unread}
-                </span>
+        <div className="flex items-center gap-8">
+          <Link to="/" className="text-xl font-extrabold text-blue-600 tracking-tight">
+            STEMS
+          </Link>
+          {user && (
+            <div className="flex items-center gap-6">
+              <NavLink to="/dashboard" className={linkClass}>
+                Dashboard
+              </NavLink>
+              <NavLink to="/feed" className={linkClass}>
+                Feed
+              </NavLink>
+              <NavLink to="/trips" className={linkClass}>
+                Trips
+              </NavLink>
+              <NavLink to="/search" className={linkClass}>
+                Search
+              </NavLink>
+              <NavLink to="/notifications" className={({ isActive }) => `relative ${linkClass({ isActive })}`}>
+                Notifications
+                {unread > 0 && (
+                  <span className="absolute -right-3 -top-1.5 rounded-full bg-red-500 px-1.5 text-[10px] font-bold text-white">
+                    {unread}
+                  </span>
+                )}
+              </NavLink>
+              {user.role === 'admin' && (
+                <NavLink to="/admin" className={linkClass}>
+                  Admin
+                </NavLink>
               )}
-            </Link>
-            {user.role === 'admin' && (
-              <Link to="/admin" className="hover:text-blue-600">Admin</Link>
-            )}
-          </div>
-        )}
+            </div>
+          )}
+        </div>
+
         <div className="flex items-center gap-3">
           {user ? (
             <>
-              <span className="hidden text-sm text-slate-500 sm:inline">Hi, {user.name}</span>
+              <span className="hidden text-sm font-medium text-slate-700 sm:inline">
+                {user.name}
+              </span>
               <button
                 onClick={handleLogout}
-                className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition"
               >
                 Logout
               </button>
             </>
           ) : (
             <>
-              <Link to="/login" className="text-sm font-medium text-slate-600 hover:text-blue-600">
+              <Link to="/login" className="text-sm font-semibold text-slate-600 hover:text-blue-600">
                 Login
               </Link>
               <Link
                 to="/register"
-                className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700"
+                className="rounded-lg bg-blue-600 px-3.5 py-1.5 text-sm font-semibold text-white hover:bg-blue-700 shadow-sm"
               >
                 Sign up
               </Link>

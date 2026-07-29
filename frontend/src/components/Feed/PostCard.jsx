@@ -51,7 +51,7 @@ export default function PostCard({ post, currentUserId, isAdmin, onDeleted }) {
             </span>
             {post.tripTitle && (
               <span className="inline-block text-xs font-medium text-slate-500">
-                📍 {post.tripTitle}
+                {post.tripTitle}
               </span>
             )}
           </div>
@@ -85,12 +85,22 @@ export default function PostCard({ post, currentUserId, isAdmin, onDeleted }) {
           ))}
         </div>
       )}
-      <div className="mt-3 flex items-center gap-4 text-sm text-slate-500">
-        <button onClick={toggleReaction} className={reacted ? 'text-blue-600' : 'hover:text-blue-600'}>
-          👍 {reactionCount}
+      <div className="mt-3 flex items-center gap-4 text-xs text-slate-500">
+        <button
+          onClick={toggleReaction}
+          className={`rounded-lg border px-3 py-1 font-semibold transition ${
+            reacted
+              ? 'border-blue-200 bg-blue-50 text-blue-600'
+              : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+          }`}
+        >
+          {reacted ? 'Liked' : 'Like'} ({reactionCount})
         </button>
-        <button onClick={() => setShowComments((s) => !s)} className="hover:text-blue-600">
-          💬 {comments.length} comments
+        <button
+          onClick={() => setShowComments((s) => !s)}
+          className="rounded-lg border border-slate-200 bg-white px-3 py-1 font-semibold text-slate-600 hover:bg-slate-50 transition"
+        >
+          Comments ({comments.length})
         </button>
       </div>
       {showComments && (

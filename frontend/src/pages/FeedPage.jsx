@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { feedService } from '../services/feedService';
 import { tripService } from '../services/tripService';
 import { useAuth } from '../hooks/useAuth';
@@ -44,11 +44,18 @@ export default function FeedPage() {
 
   return (
     <div className="space-y-4">
+      {tripId && (
+        <div>
+          <Link to={`/trips/${tripId}`} className="inline-flex items-center gap-1 text-sm font-semibold text-blue-600 hover:underline">
+            ← Back to {trip?.title || 'Trip'}
+          </Link>
+        </div>
+      )}
       <h1 className="text-2xl font-bold text-slate-900">
         {tripId ? (
           <>Feed {trip && <span className="text-base font-normal text-slate-500">· {trip.title}</span>}</>
         ) : (
-          'Collective Activity Feed 🌍'
+          'Collective Activity Feed'
         )}
       </h1>
       <ErrorMessage message={error} />
@@ -58,7 +65,10 @@ export default function FeedPage() {
       ) : (
         <div className="space-y-3">
           {posts.length === 0 && (
-            <p className="py-6 text-center text-sm text-slate-500">No posts yet. Be the first to share!</p>
+            <div className="rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center">
+              <p className="text-sm font-semibold text-slate-700">No posts yet</p>
+              <p className="mt-1 text-xs text-slate-500">Be the first to share a photo or memory from your trip.</p>
+            </div>
           )}
           {posts.map((post) => (
             <PostCard

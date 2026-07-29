@@ -44,21 +44,15 @@ export default function TripDetailPage() {
       <div className="flex flex-wrap gap-3">
         <Link
           to={`/trips/${id}/feed`}
-          className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+          className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 shadow-sm"
         >
-          Trip feed
-        </Link>
-        <Link
-          to={`/trips/${id}/bookings`}
-          className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
-        >
-          Bookings
+          Trip Feed
         </Link>
         <Link
           to={`/trips/${id}/expenses`}
-          className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+          className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 shadow-sm"
         >
-          Expenses
+          Finances & Bookings
         </Link>
       </div>
     </div>

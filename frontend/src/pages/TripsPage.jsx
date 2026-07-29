@@ -14,13 +14,17 @@ export default function TripsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showCreate, setShowCreate] = useState(false);
+  const [statusFilter, setStatusFilter] = useState('all');
   const { page, limit, totalPages, setTotalPages, next, prev, goTo } = usePagination();
   const navigate = useNavigate();
 
   function load() {
     setLoading(true);
+    const params = { page, limit };
+    if (statusFilter !== 'all') params.status = statusFilter;
+
     tripService
-      .list({ page, limit })
+      .list(params)
       .then((data) => {
         const rawTrips = data.data ?? data.trips ?? data;
         setTrips(Array.isArray(rawTrips) ? rawTrips : []);
@@ -30,18 +34,40 @@ export default function TripsPage() {
       .finally(() => setLoading(false));
   }
 
-  useEffect(load, [page]);
+  useEffect(load, [page, statusFilter]);
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-slate-900">Trips</h1>
+        <h1 className="text-2xl font-bold text-slate-900">Explore & Manage Trips</h1>
         <button
           onClick={() => setShowCreate(true)}
-          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 shadow-sm"
         >
           + New trip
         </button>
+      </div>
+
+      {/* Status Filter Tabs */}
+      <div className="flex flex-wrap gap-2 border-b border-slate-200 pb-2 text-sm font-medium">
+        {[
+          { key: 'all', label: 'All Trips' },
+          { key: 'active', label: 'Active' },
+          { key: 'planning', label: 'Planning' },
+          { key: 'completed', label: 'Completed' },
+        ].map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setStatusFilter(tab.key)}
+            className={`rounded-lg px-3 py-1.5 transition ${
+              statusFilter === tab.key
+                ? 'bg-blue-600 font-semibold text-white shadow-sm'
+                : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
       <ErrorMessage message={error} />
