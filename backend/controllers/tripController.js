@@ -44,3 +44,30 @@ exports.cancelTrip = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.getTripMembers = async (req, res, next) => {
+  try {
+    const result = await tripService.getTripMembers(req.params.id);
+    res.status(200).json(result);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.updateTrip = async (req, res, next) => {
+  try {
+    const result = await tripService.updateTrip(req.params.id, req.body, req.user.id, req.user.role);
+    res.status(200).json(result);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.deleteTrip = async (req, res, next) => {
+  try {
+    const result = await tripService.deleteTrip(req.params.id, req.user.id, req.user.role);
+    res.status(200).json(result);
+  } catch (err) {
+    next(err);
+  }
+};

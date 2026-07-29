@@ -183,3 +183,47 @@ exports.cancelTrip = async (tripId, userId, userRole) => {
     connection.release();
   }
 };
+
+exports.getTripMembers = async (tripId) => {
+  const [members] = await pool.query(
+    `SELECT tm.id, tm.user_id, tm.role, tm.joined_at, u.name, u.email
+     FROM trip_members tm
+     JOIN users u ON tm.user_id = u.id
+     WHERE tm.trip_id = ?`,
+    [tripId]
+  );
+  return { members };
+};
+
+exports.updateTrip = async (tripId, tripData, userId, userRole) => {
+  const [trips] = await pool.query('SELECT created_by FROM trips WHERE id = ?', [tripId]);
+  if (trips.length === 0) throw new AppError('Trip not found', 404);
+  if (trips[0].created_by !== userId && userRole !== 'admin') {
+    throw new AppError('Unauthorized to update this trip', 403);
+  }
+
+  const { title, description, destination, start_date, end_date, max_members, status } = tripData;
+  await pool.query(
+    `UPDATE trips SET
+       title = COALESCE(?, title),
+       description = COALESCE(?, description),
+       destination = COALESCE(?, destination),
+       start_date = COALESCE(?, start_date),
+       end_date = COALESCE(?, end_date),
+       max_members = COALESCE(?, max_members),
+       status = COALESCE(?, status)
+     WHERE id = ?`,
+    [title, description, destination, start_date, end_date, max_members, status, tripId]
+  );
+  return { message: 'Trip updated successfully' };
+};
+
+exports.deleteTrip = async (tripId, userId, userRole) => {
+  const [trips] = await pool.query('SELECT created_by FROM trips WHERE id = ?', [tripId]);
+  if (trips.length === 0) throw new AppError('Trip not found', 404);
+  if (trips[0].created_by !== userId && userRole !== 'admin') {
+    throw new AppError('Unauthorized to delete this trip', 403);
+  }
+  await pool.query('DELETE FROM trips WHERE id = ?', [tripId]);
+  return { message: 'Trip deleted successfully' };
+};

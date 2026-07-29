@@ -71,6 +71,9 @@ router.get('/', tripController.getTrips);
  *         description: Trip details
  */
 router.get('/:id', tripController.getTripById);
+router.get('/:id/members', tripController.getTripMembers);
+router.put('/:id', tripController.updateTrip);
+router.delete('/:id', tripController.deleteTrip);
 
 /**
  * @openapi
