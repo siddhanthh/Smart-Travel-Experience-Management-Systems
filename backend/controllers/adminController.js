@@ -31,7 +31,30 @@ exports.getAuditLogs = async (req, res, next) => {
       .skip(skip)
       .limit(Number(limit));
 
-    res.status(200).json({ data: logs });
+    const userIds = [...new Set(logs.map((l) => l.userId).filter(Boolean))];
+    let userMap = {};
+
+    if (userIds.length > 0) {
+      const [users] = await pool.query(
+        `SELECT id, name, email FROM users WHERE id IN (${userIds.map(() => '?').join(',')})`,
+        userIds
+      );
+      users.forEach((u) => {
+        userMap[u.id] = u;
+      });
+    }
+
+    const enrichedLogs = logs.map((log) => {
+      const u = userMap[log.userId];
+      return {
+        ...log.toObject(),
+        timestamp: log.createdAt || log.timestamp || new Date(),
+        userName: u ? u.name : log.userId ? `User #${log.userId}` : 'System Admin',
+        userEmail: u ? u.email : null,
+      };
+    });
+
+    res.status(200).json({ data: enrichedLogs });
   } catch (err) {
     next(err);
   }

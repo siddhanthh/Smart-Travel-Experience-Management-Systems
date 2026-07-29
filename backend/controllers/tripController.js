@@ -11,7 +11,7 @@ exports.createTrip = async (req, res, next) => {
 
 exports.getTrips = async (req, res, next) => {
   try {
-    const result = await tripService.getTrips(req.query);
+    const result = await tripService.getTrips({ ...req.query, userId: req.user?.id });
     res.status(200).json(result);
   } catch (err) {
     next(err);
@@ -39,6 +39,42 @@ exports.joinTrip = async (req, res, next) => {
 exports.cancelTrip = async (req, res, next) => {
   try {
     const result = await tripService.cancelTrip(req.params.id, req.user.id, req.user.role);
+    res.status(200).json(result);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getTripMembers = async (req, res, next) => {
+  try {
+    const result = await tripService.getTripMembers(req.params.id);
+    res.status(200).json(result);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.updateTrip = async (req, res, next) => {
+  try {
+    const result = await tripService.updateTrip(req.params.id, req.body, req.user.id, req.user.role);
+    res.status(200).json(result);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.deleteTrip = async (req, res, next) => {
+  try {
+    const result = await tripService.deleteTrip(req.params.id, req.user.id, req.user.role);
+    res.status(200).json(result);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.leaveTrip = async (req, res, next) => {
+  try {
+    const result = await tripService.leaveTrip(req.params.id, req.user.id);
     res.status(200).json(result);
   } catch (err) {
     next(err);

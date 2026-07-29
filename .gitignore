@@ -27,3 +27,4 @@ npm-debug.log*
 # ── Coverage reports ──
 coverage/
 IMPLEMENTATION_PLAN.md
+frontend_changes_summary.md

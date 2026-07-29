@@ -15,6 +15,7 @@ const expensRoutes = require('./routes/expenseRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const searchRoutes = require('./routes/searchRoutes');
 const notificationRoutes= require('./routes/notificationRoutes');
+const userRoutes = require('./routes/userRoutes');
 
 const app = express();
 
@@ -33,6 +34,7 @@ app.use('/uploads',express.static(path.join(__dirname,'uploads')));
 app.use('/api-docs',swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
 app.use('/api/trips',tripRoutes);
 app.use('/api/bookings',bookingRoutes);
 app.use('/api/feed', feedRoutes);

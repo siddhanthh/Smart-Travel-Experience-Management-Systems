@@ -61,7 +61,45 @@ router.post('/', validate(createBookingSchema), isTripMember, bookingController.
  *         description: Bookings list
  */
 router.get('/trip/:tripId', isTripMember, bookingController.getTripBookings);
+
+/**
+ * @openapi
+ * /bookings/{id}:
+ *   get:
+ *     summary: Get booking by ID
+ *     tags: [Bookings]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Booking details
+ */
 router.get('/:id', bookingController.getBookingById);
+
+/**
+ * @openapi
+ * /bookings/{id}/cancel:
+ *   put:
+ *     summary: Cancel a booking
+ *     tags: [Bookings]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Booking cancelled
+ */
 router.put('/:id/cancel', bookingController.cancelBooking);
 
 module.exports = router;

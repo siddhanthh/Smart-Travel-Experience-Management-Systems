@@ -28,6 +28,15 @@ exports.getTripFeed = async (req, res, next) => {
   }
 };
 
+exports.getAllFeed = async (req, res, next) => {
+  try {
+    const posts = await feedService.getAllFeed(req.query);
+    res.status(200).json({ data: posts });
+  } catch (err) {
+    next(err);
+  }
+};
+
 exports.addComment = async (req, res, next) => {
   try {
     const comment = await feedService.addComment(req.params.postId, req.user.id, req.body.content);
