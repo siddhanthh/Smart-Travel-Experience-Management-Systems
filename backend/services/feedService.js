@@ -4,6 +4,7 @@ const Reaction = require('../models/Reaction');
 const mongoose = require('mongoose');
 const pool = require('../config/db.mysql');
 const { AppError } = require('../middleware/errorHandler');
+const notificationService = require('./notificationService');
 
 exports.createPost = async ({ tripId, userId, content, files }) => {
   const imageUrls = files ? files.map((file) => `/uploads/${file.filename}`) : [];
@@ -152,6 +153,23 @@ exports.addComment = async (postId, userId, content) => {
     content
   });
 
+  if (post.userId && Number(post.userId) !== Number(userId)) {
+    let commenterName = 'Someone';
+    try {
+      const [uRows] = await pool.query('SELECT name FROM users WHERE id = ?', [userId]);
+      if (uRows.length > 0) commenterName = uRows[0].name;
+    } catch {}
+
+    notificationService.createNotification({
+      userId: post.userId,
+      type: 'post_comment',
+      title: 'New Comment on Your Post',
+      message: `${commenterName} commented: "${content.length > 35 ? content.slice(0, 35) + '...' : content}"`,
+      referenceId: post._id,
+      referenceType: 'post'
+    }).catch(() => {});
+  }
+
   return comment;
 };
 
@@ -172,6 +190,24 @@ exports.toggleReaction = async (postId, userId) => {
       postId: new mongoose.Types.ObjectId(postId),
       userId
     });
+
+    if (post.userId && Number(post.userId) !== Number(userId)) {
+      let reactorName = 'Someone';
+      try {
+        const [uRows] = await pool.query('SELECT name FROM users WHERE id = ?', [userId]);
+        if (uRows.length > 0) reactorName = uRows[0].name;
+      } catch {}
+
+      notificationService.createNotification({
+        userId: post.userId,
+        type: 'post_like',
+        title: 'New Like on Your Post',
+        message: `${reactorName} liked your post.`,
+        referenceId: post._id,
+        referenceType: 'post'
+      }).catch(() => {});
+    }
+
     return { message: 'Reaction added', reacted: true };
   }
 };
