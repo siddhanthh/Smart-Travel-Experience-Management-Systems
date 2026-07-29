@@ -19,11 +19,10 @@ export default function AddExpense({ tripId, members = [], onAdded }) {
     setLoading(true);
     try {
       const expense = await expenseService.add({
-        tripId,
-        trip_id: tripId,
+        trip_id: Number(tripId),
         title,
         amount: Number(amount),
-        splitAmong,
+        split_among: splitAmong,
       });
       setTitle('');
       setAmount('');

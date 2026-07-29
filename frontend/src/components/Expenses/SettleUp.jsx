@@ -18,10 +18,8 @@ export default function SettleUp({ open, onClose, tripId, balances = [], current
     setLoading(true);
     try {
       await expenseService.settle({
-        tripId,
-        trip_id: tripId,
-        payerId: currentUserId,
-        payeeId: Number(payeeId),
+        trip_id: Number(tripId),
+        payee_id: Number(payeeId),
         amount: Number(amount),
       });
       onSettled?.();
