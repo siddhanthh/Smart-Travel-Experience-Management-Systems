@@ -17,3 +17,21 @@ exports.markRead = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.markAllRead = async (req, res, next) => {
+  try {
+    const result = await notificationService.markAllAsRead(req.user.id);
+    res.status(200).json(result);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getUnreadCount = async (req, res, next) => {
+  try {
+    const result = await notificationService.getUnreadCount(req.user.id);
+    res.status(200).json(result);
+  } catch (err) {
+    next(err);
+  }
+};

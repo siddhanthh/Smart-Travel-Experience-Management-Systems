@@ -38,3 +38,13 @@ exports.markAsRead = async (notificationId, userId) => {
   await Notification.updateOne({ _id: notificationId, userId }, { isRead: true });
   return { message: 'Notification marked as read' };
 };
+
+exports.markAllAsRead = async (userId) => {
+  await Notification.updateMany({ userId, isRead: false }, { isRead: true });
+  return { message: 'All notifications marked as read' };
+};
+
+exports.getUnreadCount = async (userId) => {
+  const count = await Notification.countDocuments({ userId, isRead: false });
+  return { unreadCount: count };
+};
