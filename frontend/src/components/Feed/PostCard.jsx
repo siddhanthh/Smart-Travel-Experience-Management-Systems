@@ -2,6 +2,14 @@ import { useState } from 'react';
 import { feedService } from '../../services/feedService';
 import CommentSection from './CommentSection';
 
+const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '');
+
+function getImageUrl(path) {
+  if (!path) return '';
+  if (path.startsWith('http://') || path.startsWith('https://')) return path;
+  return `${API_BASE}${path.startsWith('/') ? '' : '/'}${path}`;
+}
+
 export default function PostCard({ post, currentUserId, isAdmin, onDeleted }) {
   const [reacted, setReacted] = useState(post.reactedByMe ?? false);
   const [reactionCount, setReactionCount] = useState(post.reactionCount ?? 0);
@@ -41,10 +49,25 @@ export default function PostCard({ post, currentUserId, isAdmin, onDeleted }) {
         )}
       </div>
       {post.content && <p className="mt-2 text-sm text-slate-700">{post.content}</p>}
-      {post.images?.length > 0 && (
-        <div className="mt-2 grid grid-cols-2 gap-2">
+      {post.images?.length === 1 && (
+        <div className="mt-3 overflow-hidden rounded-xl bg-slate-900/5 flex items-center justify-center">
+          <img
+            src={getImageUrl(post.images[0])}
+            alt=""
+            className="max-h-[420px] w-full rounded-xl object-contain"
+          />
+        </div>
+      )}
+      {post.images?.length > 1 && (
+        <div className={`mt-3 grid gap-2 ${post.images.length === 2 ? 'grid-cols-2' : 'grid-cols-2 sm:grid-cols-3'}`}>
           {post.images.map((src, i) => (
-            <img key={i} src={src} alt="" className="h-32 w-full rounded-lg object-cover" />
+            <div key={i} className="overflow-hidden rounded-lg bg-slate-100 aspect-[4/3]">
+              <img
+                src={getImageUrl(src)}
+                alt=""
+                className="h-full w-full object-cover transition-transform duration-200 hover:scale-105"
+              />
+            </div>
           ))}
         </div>
       )}
