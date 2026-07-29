@@ -10,10 +10,15 @@ export default function Navbar() {
 
   useEffect(() => {
     if (!user) return;
-    notificationService
-      .unreadCount()
-      .then((d) => setUnread(d.count ?? d.unreadCount ?? 0))
-      .catch(() => {});
+    function checkUnread() {
+      notificationService
+        .unreadCount()
+        .then((d) => setUnread(d.count ?? d.unreadCount ?? 0))
+        .catch(() => {});
+    }
+    checkUnread();
+    const interval = setInterval(checkUnread, 5000); // Live poll every 5 seconds
+    return () => clearInterval(interval);
   }, [user]);
 
   async function handleLogout() {

@@ -10,8 +10,8 @@ export default function NotificationsPage() {
   const [loading, setLoading] = useState(true);
   const { page, limit, totalPages, setTotalPages, next, prev, goTo } = usePagination();
 
-  function load() {
-    setLoading(true);
+  function load(silent = false) {
+    if (!silent) setLoading(true);
     notificationService
       .list({ page, limit })
       .then((data) => {
@@ -19,10 +19,16 @@ export default function NotificationsPage() {
         setNotifications(Array.isArray(rawNotifs) ? rawNotifs : []);
         setTotalPages(data.pagination?.totalPages ?? data.totalPages ?? 1);
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        if (!silent) setLoading(false);
+      });
   }
 
-  useEffect(load, [page]);
+  useEffect(() => {
+    load(false);
+    const interval = setInterval(() => load(true), 5000); // Silent live poll every 5 seconds
+    return () => clearInterval(interval);
+  }, [page]);
 
   async function markAllRead() {
     await notificationService.markAllRead();
