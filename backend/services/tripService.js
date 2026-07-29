@@ -39,33 +39,39 @@ exports.createTrip = async (tripData, userId) => {
   }
 };
 
-exports.getTrips = async ({ page = 1, limit = 10, destination, status, search }) => {
-  const offset = (page - 1) * limit;
-  let query = 'SELECT * FROM trips WHERE 1=1';
+exports.getTrips = async ({ page = 1, limit = 10, destination, status, search, mine, userId }) => {
+  const offset = (Number(page) - 1) * Number(limit);
+  let whereClause = ' WHERE 1=1';
   const queryParams = [];
 
   if (destination) {
-    query += ' AND destination LIKE ?';
+    whereClause += ' AND t.destination LIKE ?';
     queryParams.push(`%${destination}%`);
   }
   if (status) {
-    query += ' AND status = ?';
+    whereClause += ' AND t.status = ?';
     queryParams.push(status);
   }
   if (search) {
-    query += ' AND (title LIKE ? OR description LIKE ?)';
+    whereClause += ' AND (t.title LIKE ? OR t.description LIKE ?)';
     queryParams.push(`%${search}%`, `%${search}%`);
   }
+  if (mine && userId) {
+    whereClause += ' AND (t.created_by = ? OR EXISTS (SELECT 1 FROM trip_members tm WHERE tm.trip_id = t.id AND tm.user_id = ?))';
+    queryParams.push(userId, userId);
+  }
 
-  // Count total matching records for pagination metadata
-  const countQuery = query.replace('SELECT *', 'SELECT COUNT(*) as total');
-  const [countRows] = await pool.query(countQuery, queryParams);
+  const [countRows] = await pool.query(`SELECT COUNT(*) as total FROM trips t ${whereClause}`, queryParams);
   const total = countRows[0].total;
 
-  query += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
-  queryParams.push(Number(limit), Number(offset));
-
-  const [trips] = await pool.query(query, queryParams);
+  const dataQuery = `
+    SELECT t.*, (SELECT COUNT(*) FROM trip_members tm WHERE tm.trip_id = t.id) as member_count
+    FROM trips t
+    ${whereClause}
+    ORDER BY t.created_at DESC
+    LIMIT ? OFFSET ?
+  `;
+  const [trips] = await pool.query(dataQuery, [...queryParams, Number(limit), offset]);
 
   return {
     data: trips,

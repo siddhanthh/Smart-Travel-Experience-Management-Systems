@@ -11,7 +11,7 @@ exports.createTrip = async (req, res, next) => {
 
 exports.getTrips = async (req, res, next) => {
   try {
-    const result = await tripService.getTrips(req.query);
+    const result = await tripService.getTrips({ ...req.query, userId: req.user?.id });
     res.status(200).json(result);
   } catch (err) {
     next(err);

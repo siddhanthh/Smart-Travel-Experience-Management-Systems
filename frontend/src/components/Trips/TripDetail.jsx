@@ -2,6 +2,17 @@ import { useState } from 'react';
 import { tripService } from '../../services/tripService';
 import ErrorMessage from '../Common/ErrorMessage';
 
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return dateStr;
+  return d.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+}
+
 export default function TripDetail({ trip, members, currentUserId, isAdmin, onUpdated }) {
   const [error, setError] = useState('');
   const [joining, setJoining] = useState(false);
@@ -48,7 +59,7 @@ export default function TripDetail({ trip, members, currentUserId, isAdmin, onUp
         </div>
         {trip.description && <p className="mt-3 text-sm text-slate-600">{trip.description}</p>}
         <div className="mt-4 flex flex-wrap gap-6 text-sm text-slate-500">
-          <span>📅 {trip.start_date} → {trip.end_date}</span>
+          <span>📅 {formatDate(trip.start_date)} – {formatDate(trip.end_date)}</span>
           <span>👥 {members?.length ?? 0} / {trip.max_members} members</span>
         </div>
         <div className="mt-4 flex gap-2">

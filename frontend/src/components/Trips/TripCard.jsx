@@ -7,7 +7,20 @@ const statusColors = {
   cancelled: 'bg-red-100 text-red-700',
 };
 
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return dateStr;
+  return d.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+}
+
 export default function TripCard({ trip }) {
+  const memberCount = trip.member_count ?? trip.memberCount ?? trip.members?.length ?? 1;
+
   return (
     <Link
       to={`/trips/${trip.id}`}
@@ -21,10 +34,10 @@ export default function TripCard({ trip }) {
       </div>
       <p className="mt-1 text-sm text-slate-500">{trip.destination}</p>
       <p className="mt-2 text-xs text-slate-400">
-        {trip.start_date} → {trip.end_date}
+        📅 {formatDate(trip.start_date)} – {formatDate(trip.end_date)}
       </p>
       <p className="mt-2 text-xs font-medium text-slate-600">
-        {trip.member_count ?? '—'} / {trip.max_members} members
+        👥 {memberCount} / {trip.max_members} members
       </p>
     </Link>
   );
