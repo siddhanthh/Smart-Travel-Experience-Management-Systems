@@ -53,18 +53,27 @@ exports.getTripFeed = async (tripId, { page = 1, limit = 10 }) => {
         reactionCount: { $size: '$reactions' }
       }
     },
-    // Exclude raw arrays to optimize payload size
-    { $project: { comments: 0, reactions: 0 } }
+    { $project: { reactions: 0 } }
   ]);
 
-  // Hydrate user profile names from MySQL
-  const userIds = [...new Set(posts.map((p) => p.userId))];
+  // Extract all user IDs (post authors + comment authors)
+  const allUserIds = new Set();
+  posts.forEach((p) => {
+    if (p.userId) allUserIds.add(p.userId);
+    if (Array.isArray(p.comments)) {
+      p.comments.forEach((c) => {
+        if (c.userId) allUserIds.add(c.userId);
+      });
+    }
+  });
+
+  const userIdsArray = [...allUserIds];
   let userMap = {};
 
-  if (userIds.length > 0) {
+  if (userIdsArray.length > 0) {
     const [users] = await pool.query(
-      `SELECT id, name FROM users WHERE id IN (${userIds.map(() => '?').join(',')})`,
-      userIds
+      `SELECT id, name FROM users WHERE id IN (${userIdsArray.map(() => '?').join(',')})`,
+      userIdsArray
     );
     users.forEach((u) => {
       userMap[u.id] = u.name;
@@ -73,7 +82,11 @@ exports.getTripFeed = async (tripId, { page = 1, limit = 10 }) => {
 
   const enrichedPosts = posts.map((post) => ({
     ...post,
-    authorName: userMap[post.userId] || 'Unknown User'
+    authorName: userMap[post.userId] || 'Unknown User',
+    comments: (post.comments || []).map((c) => ({
+      ...c,
+      authorName: userMap[c.userId] || `User #${c.userId}`
+    }))
   }));
 
   return enrichedPosts;
@@ -108,18 +121,28 @@ exports.getAllFeed = async ({ page = 1, limit = 20 }) => {
         reactionCount: { $size: '$reactions' }
       }
     },
-    { $project: { comments: 0, reactions: 0 } }
+    { $project: { reactions: 0 } }
   ]);
 
-  const userIds = [...new Set(posts.map((p) => p.userId))];
+  const allUserIds = new Set();
+  posts.forEach((p) => {
+    if (p.userId) allUserIds.add(p.userId);
+    if (Array.isArray(p.comments)) {
+      p.comments.forEach((c) => {
+        if (c.userId) allUserIds.add(c.userId);
+      });
+    }
+  });
+
   const tripIds = [...new Set(posts.map((p) => p.tripId))];
+  const userIdsArray = [...allUserIds];
   let userMap = {};
   let tripMap = {};
 
-  if (userIds.length > 0) {
+  if (userIdsArray.length > 0) {
     const [users] = await pool.query(
-      `SELECT id, name FROM users WHERE id IN (${userIds.map(() => '?').join(',')})`,
-      userIds
+      `SELECT id, name FROM users WHERE id IN (${userIdsArray.map(() => '?').join(',')})`,
+      userIdsArray
     );
     users.forEach((u) => {
       userMap[u.id] = u.name;
@@ -139,7 +162,11 @@ exports.getAllFeed = async ({ page = 1, limit = 20 }) => {
   return posts.map((post) => ({
     ...post,
     authorName: userMap[post.userId] || 'Unknown User',
-    tripTitle: tripMap[post.tripId] || `Trip #${post.tripId}`
+    tripTitle: tripMap[post.tripId] || `Trip #${post.tripId}`,
+    comments: (post.comments || []).map((c) => ({
+      ...c,
+      authorName: userMap[c.userId] || `User #${c.userId}`
+    }))
   }));
 };
 
@@ -153,13 +180,13 @@ exports.addComment = async (postId, userId, content) => {
     content
   });
 
-  if (post.userId && Number(post.userId) !== Number(userId)) {
-    let commenterName = 'Someone';
-    try {
-      const [uRows] = await pool.query('SELECT name FROM users WHERE id = ?', [userId]);
-      if (uRows.length > 0) commenterName = uRows[0].name;
-    } catch {}
+  let commenterName = 'Someone';
+  try {
+    const [uRows] = await pool.query('SELECT name FROM users WHERE id = ?', [userId]);
+    if (uRows.length > 0) commenterName = uRows[0].name;
+  } catch {}
 
+  if (post.userId && Number(post.userId) !== Number(userId)) {
     notificationService.createNotification({
       userId: post.userId,
       type: 'post_comment',
@@ -170,7 +197,10 @@ exports.addComment = async (postId, userId, content) => {
     }).catch(() => {});
   }
 
-  return comment;
+  return {
+    ...comment.toObject(),
+    authorName: commenterName
+  };
 };
 
 exports.toggleReaction = async (postId, userId) => {

@@ -21,12 +21,15 @@ export default function CommentSection({ postId, comments = [], onCommentAdded }
   return (
     <div className="mt-3 border-t border-slate-100 pt-3">
       <ul className="space-y-2">
-        {comments.map((c) => (
-          <li key={c._id || c.id} className="text-sm">
-            <span className="font-medium text-slate-800">{c.userName || `User #${c.userId}`}: </span>
-            <span className="text-slate-600">{c.content}</span>
-          </li>
-        ))}
+        {comments.map((c) => {
+          const displayName = c.authorName || c.userName || c.user?.name || (c.userId ? `User #${c.userId}` : 'User');
+          return (
+            <li key={c._id || c.id} className="text-sm">
+              <span className="font-semibold text-slate-800">{displayName}: </span>
+              <span className="text-slate-600">{c.content}</span>
+            </li>
+          );
+        })}
       </ul>
       <form onSubmit={handleSubmit} className="mt-2 flex gap-2">
         <input
