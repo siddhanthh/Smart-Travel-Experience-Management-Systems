@@ -29,6 +29,7 @@ export default function Navbar() {
         </Link>
         {user && (
           <div className="hidden items-center gap-5 text-sm font-medium text-slate-600 md:flex">
+            <Link to="/feed" className="hover:text-blue-600">Feed</Link>
             <Link to="/trips" className="hover:text-blue-600">Trips</Link>
             <Link to="/search" className="hover:text-blue-600">Search</Link>
             <Link to="/notifications" className="relative hover:text-blue-600">

@@ -78,6 +78,70 @@ exports.getTripFeed = async (tripId, { page = 1, limit = 10 }) => {
   return enrichedPosts;
 };
 
+exports.getAllFeed = async ({ page = 1, limit = 20 }) => {
+  const skip = (Number(page) - 1) * Number(limit);
+
+  const posts = await Post.aggregate([
+    { $sort: { createdAt: -1 } },
+    { $skip: skip },
+    { $limit: Number(limit) },
+    {
+      $lookup: {
+        from: 'comments',
+        localField: '_id',
+        foreignField: 'postId',
+        as: 'comments'
+      }
+    },
+    {
+      $lookup: {
+        from: 'reactions',
+        localField: '_id',
+        foreignField: 'postId',
+        as: 'reactions'
+      }
+    },
+    {
+      $addFields: {
+        commentCount: { $size: '$comments' },
+        reactionCount: { $size: '$reactions' }
+      }
+    },
+    { $project: { comments: 0, reactions: 0 } }
+  ]);
+
+  const userIds = [...new Set(posts.map((p) => p.userId))];
+  const tripIds = [...new Set(posts.map((p) => p.tripId))];
+  let userMap = {};
+  let tripMap = {};
+
+  if (userIds.length > 0) {
+    const [users] = await pool.query(
+      `SELECT id, name FROM users WHERE id IN (${userIds.map(() => '?').join(',')})`,
+      userIds
+    );
+    users.forEach((u) => {
+      userMap[u.id] = u.name;
+    });
+  }
+
+  if (tripIds.length > 0) {
+    const [trips] = await pool.query(
+      `SELECT id, title FROM trips WHERE id IN (${tripIds.map(() => '?').join(',')})`,
+      tripIds
+    );
+    trips.forEach((t) => {
+      tripMap[t.id] = t.title;
+    });
+  }
+
+  return posts.map((post) => ({
+    ...post,
+    authorName: userMap[post.userId] || 'Unknown User',
+    tripTitle: tripMap[post.tripId] || `Trip #${post.tripId}`
+  }));
+};
+
 exports.addComment = async (postId, userId, content) => {
   const post = await Post.findById(postId);
   if (!post) throw new AppError('Post not found', 404);

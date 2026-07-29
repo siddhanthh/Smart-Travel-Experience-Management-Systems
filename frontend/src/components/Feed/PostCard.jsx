@@ -35,15 +35,29 @@ export default function PostCard({ post, currentUserId, isAdmin, onDeleted }) {
   }
 
   const canDelete = isAdmin || post.userId === currentUserId;
+  const displayName = post.authorName || post.userName || post.user?.name || `User #${post.userId}`;
+  const initial = displayName.replace(/^User #/, 'U')[0]?.toUpperCase() || 'U';
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4">
-      <div className="flex items-start justify-between">
-        <span className="text-sm font-semibold text-slate-800">
-          {post.userName || `User #${post.userId}`}
-        </span>
+    <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:shadow-md">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-700">
+            {initial}
+          </div>
+          <div>
+            <span className="block text-sm font-semibold text-slate-900">
+              {displayName}
+            </span>
+            {post.tripTitle && (
+              <span className="inline-block text-xs font-medium text-slate-500">
+                📍 {post.tripTitle}
+              </span>
+            )}
+          </div>
+        </div>
         {canDelete && (
-          <button onClick={handleDelete} className="text-xs text-red-500 hover:underline">
+          <button onClick={handleDelete} className="text-xs font-medium text-red-500 hover:underline">
             Delete
           </button>
         )}

@@ -42,6 +42,20 @@ router.post('/posts', upload.array('images', 5), validate(createPostSchema), fee
 
 /**
  * @openapi
+ * /feed/posts:
+ *   get:
+ *     summary: Get collective feed across all trips
+ *     tags: [Feed]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of feed posts across all trips
+ */
+router.get('/posts', feedController.getAllFeed);
+
+/**
+ * @openapi
  * /feed/posts/trip/{tripId}:
  *   get:
  *     summary: Get social feed for a trip

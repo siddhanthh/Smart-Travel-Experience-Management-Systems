@@ -18,14 +18,26 @@ export default function FeedPage() {
 
   function load() {
     setLoading(true);
-    Promise.all([feedService.getFeedForTrip(tripId), tripService.getById(tripId)])
-      .then(([feedData, tripData]) => {
-        const rawPosts = feedData.data ?? feedData.posts ?? feedData;
-        setPosts(Array.isArray(rawPosts) ? rawPosts : []);
-        setTrip(tripData.data ?? tripData.trip ?? tripData);
-      })
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
+    if (tripId) {
+      Promise.all([feedService.getFeedForTrip(tripId), tripService.getById(tripId)])
+        .then(([feedData, tripData]) => {
+          const rawPosts = feedData.data ?? feedData.posts ?? feedData;
+          setPosts(Array.isArray(rawPosts) ? rawPosts : []);
+          setTrip(tripData.data ?? tripData.trip ?? tripData);
+        })
+        .catch((err) => setError(err.message))
+        .finally(() => setLoading(false));
+    } else {
+      feedService
+        .getAllFeed()
+        .then((feedData) => {
+          const rawPosts = feedData.data ?? feedData.posts ?? feedData;
+          setPosts(Array.isArray(rawPosts) ? rawPosts : []);
+          setTrip(null);
+        })
+        .catch((err) => setError(err.message))
+        .finally(() => setLoading(false));
+    }
   }
 
   useEffect(load, [tripId]);
@@ -33,7 +45,11 @@ export default function FeedPage() {
   return (
     <div className="space-y-4">
       <h1 className="text-2xl font-bold text-slate-900">
-        Feed {trip && <span className="text-base font-normal text-slate-500">· {trip.title}</span>}
+        {tripId ? (
+          <>Feed {trip && <span className="text-base font-normal text-slate-500">· {trip.title}</span>}</>
+        ) : (
+          'Collective Activity Feed 🌍'
+        )}
       </h1>
       <ErrorMessage message={error} />
       <CreatePost tripId={tripId} onPosted={load} />

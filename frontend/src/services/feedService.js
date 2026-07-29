@@ -16,6 +16,7 @@ export const feedService = {
   },
   getFeedForTrip: (tripId, params) =>
     api.get(`/feed/posts/trip/${tripId}`, { params }).then((r) => r.data),
+  getAllFeed: (params) => api.get('/feed/posts', { params }).then((r) => r.data),
   getPost: (id) => api.get(`/feed/posts/${id}`).then((r) => r.data),
   deletePost: (id) => api.delete(`/feed/posts/${id}`).then((r) => r.data),
   addComment: (postId, content) =>

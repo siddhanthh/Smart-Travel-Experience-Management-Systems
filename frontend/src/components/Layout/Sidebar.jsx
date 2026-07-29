@@ -14,6 +14,7 @@ export default function Sidebar() {
     <aside className="hidden w-56 shrink-0 border-r border-slate-200 bg-white p-4 md:block">
       <nav className="space-y-1">
         <NavLink to="/dashboard" className={linkClass}>Dashboard</NavLink>
+        <NavLink to="/feed" className={linkClass}>Feed</NavLink>
         <NavLink to="/trips" className={linkClass}>Trips</NavLink>
         <NavLink to="/notifications" className={linkClass}>Notifications</NavLink>
         <NavLink to="/search" className={linkClass}>Search</NavLink>

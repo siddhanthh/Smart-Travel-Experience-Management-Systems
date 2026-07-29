@@ -28,6 +28,7 @@ export default function App() {
 
             <Route element={<ProtectedRoute />}>
               <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/feed" element={<FeedPage />} />
               <Route path="/trips" element={<TripsPage />} />
               <Route path="/trips/:id" element={<TripDetailPage />} />
               <Route path="/trips/:id/feed" element={<FeedPage />} />
