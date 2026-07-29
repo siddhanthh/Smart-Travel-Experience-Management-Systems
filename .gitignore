@@ -28,3 +28,4 @@ npm-debug.log*
 coverage/
 IMPLEMENTATION_PLAN.md
 frontend_changes_summary.md
+frontend\src\components\Layout\Sidebar.jsx
