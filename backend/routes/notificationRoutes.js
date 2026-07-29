@@ -18,7 +18,33 @@ router.use(authenticate);
  *         description: List of notifications and unread count
  */
 router.get('/', notificationController.getNotifications);
+
+/**
+ * @openapi
+ * /notifications/unread-count:
+ *   get:
+ *     summary: Get count of unread notifications
+ *     tags: [Notifications]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Unread notification count
+ */
 router.get('/unread-count', notificationController.getUnreadCount);
+
+/**
+ * @openapi
+ * /notifications/read-all:
+ *   put:
+ *     summary: Mark all notifications as read
+ *     tags: [Notifications]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: All notifications marked as read
+ */
 router.put('/read-all', notificationController.markAllRead);
 
 /**

@@ -71,7 +71,59 @@ router.get('/', tripController.getTrips);
  *         description: Trip details
  */
 router.get('/:id', tripController.getTripById);
+
+/**
+ * @openapi
+ * /trips/{id}/members:
+ *   get:
+ *     summary: Get trip members list
+ *     tags: [Trips]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: List of members in trip
+ */
 router.get('/:id/members', tripController.getTripMembers);
+
+/**
+ * @openapi
+ * /trips/{id}:
+ *   put:
+ *     summary: Update trip details
+ *     tags: [Trips]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Trip updated successfully
+ *   delete:
+ *     summary: Delete a trip
+ *     tags: [Trips]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Trip deleted successfully
+ */
 router.put('/:id', tripController.updateTrip);
 router.delete('/:id', tripController.deleteTrip);
 
