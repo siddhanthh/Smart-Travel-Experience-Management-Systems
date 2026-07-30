@@ -20,3 +20,11 @@ export function AdminRoute() {
   if (!isAdmin) return <Navigate to="/dashboard" replace />;
   return <Outlet />;
 }
+
+export function PublicRoute() {
+  const { user, loading } = useAuth();
+
+  if (loading) return <LoadingSpinner label="Checking session…" />;
+  if (user) return <Navigate to="/dashboard" replace />;
+  return <Outlet />;
+}
