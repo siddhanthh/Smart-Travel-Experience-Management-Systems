@@ -64,10 +64,3 @@ STEMS is a full-stack group travel management platform. It centralizes itinerary
    npm run dev
    ```
 
-## Contributing
-
-Contributions are welcome. Please ensure that any pull requests align with the existing architectural patterns, particularly regarding the dual-database transaction policies and the React component hierarchy.
-
-## License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
