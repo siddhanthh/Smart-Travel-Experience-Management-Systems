@@ -80,12 +80,6 @@ STEMS/
 - **Relational Data**: MySQL Database
 - **Document Data**: MongoDB Atlas Cluster
 
-## Key Learnings
-
-- Built a full-stack web application with a decoupled React frontend and Express backend.
-- Designed a hybrid dual-database architecture using MySQL for transactional data and MongoDB for flexible schemas.
-- Implemented JWT authentication supporting cross-domain and mobile browser sessions.
-- Deployed a production-ready application across Vercel and Render.
 
 ## License
 
