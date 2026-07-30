@@ -1,7 +1,7 @@
 const Notification = require('../models/Notification');
 
-exports.createNotification = async ({ userId, type, title, message, referenceId, referenceType }) => {
-  const idempotencyKey = `${type}:${userId}:${referenceId || Date.now()}`;
+exports.createNotification = async ({ userId, type, title, message, referenceId, referenceType, idempotencyKey }) => {
+  const finalIdempotencyKey = idempotencyKey || `${type}:${userId}:${referenceId || Date.now()}`;
   try {
     const notif = await Notification.create({
       userId,
@@ -10,7 +10,7 @@ exports.createNotification = async ({ userId, type, title, message, referenceId,
       message,
       referenceId: String(referenceId),
       referenceType,
-      idempotencyKey
+      idempotencyKey: finalIdempotencyKey
     });
     return notif;
   } catch (err) {

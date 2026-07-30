@@ -1,6 +1,7 @@
 const Post = require('../models/Post');
 const Comment = require('../models/Comment');
 const Reaction = require('../models/Reaction');
+const Notification = require('../models/Notification');
 const mongoose = require('mongoose');
 const pool = require('../config/db.mysql');
 const { AppError } = require('../middleware/errorHandler');
@@ -32,7 +33,7 @@ exports.deletePost = async (postId) => {
 };
 
 // MongoDB Aggregation Pipeline to join comments and reactions
-exports.getTripFeed = async (tripId, { page = 1, limit = 10 }) => {
+exports.getTripFeed = async (tripId, { page = 1, limit = 10, currentUserId }) => {
   const skip = (Number(page) - 1) * Number(limit);
 
   const posts = await Post.aggregate([
@@ -62,7 +63,14 @@ exports.getTripFeed = async (tripId, { page = 1, limit = 10 }) => {
     {
       $addFields: {
         commentCount: { $size: '$comments' },
-        reactionCount: { $size: '$reactions' }
+        reactionCount: { $size: '$reactions' },
+        reactedByMe: {
+          $cond: {
+            if: { $in: [Number(currentUserId), '$reactions.userId'] },
+            then: true,
+            else: false
+          }
+        }
       }
     },
     { $project: { reactions: 0 } }
@@ -104,7 +112,7 @@ exports.getTripFeed = async (tripId, { page = 1, limit = 10 }) => {
   return enrichedPosts;
 };
 
-exports.getAllFeed = async ({ page = 1, limit = 20 }) => {
+exports.getAllFeed = async ({ page = 1, limit = 20, currentUserId }) => {
   const skip = (Number(page) - 1) * Number(limit);
 
   const posts = await Post.aggregate([
@@ -130,7 +138,14 @@ exports.getAllFeed = async ({ page = 1, limit = 20 }) => {
     {
       $addFields: {
         commentCount: { $size: '$comments' },
-        reactionCount: { $size: '$reactions' }
+        reactionCount: { $size: '$reactions' },
+        reactedByMe: {
+          $cond: {
+            if: { $in: [Number(currentUserId), '$reactions.userId'] },
+            then: true,
+            else: false
+          }
+        }
       }
     },
     { $project: { reactions: 0 } }
@@ -205,7 +220,8 @@ exports.addComment = async (postId, userId, content) => {
       title: 'New Comment on Your Post',
       message: `${commenterName} commented: "${content.length > 35 ? content.slice(0, 35) + '...' : content}"`,
       referenceId: post._id,
-      referenceType: 'post'
+      referenceType: 'post',
+      idempotencyKey: `post_comment:${userId}:${comment._id}`
     }).catch(() => {});
   }
 
@@ -226,6 +242,12 @@ exports.toggleReaction = async (postId, userId) => {
 
   if (existing) {
     await Reaction.findByIdAndDelete(existing._id);
+    // Delete corresponding like notification
+    await Notification.deleteOne({
+      userId: post.userId,
+      type: 'post_like',
+      referenceId: String(post._id)
+    });
     return { message: 'Reaction removed', reacted: false };
   } else {
     await Reaction.create({

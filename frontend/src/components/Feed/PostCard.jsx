@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { feedService } from '../../services/feedService';
 import CommentSection from './CommentSection';
 import ConfirmModal from '../Common/ConfirmModal';
@@ -17,8 +17,19 @@ export default function PostCard({ post, currentUserId, isAdmin, onDeleted }) {
   const [comments, setComments] = useState(post.comments ?? []);
   const [showComments, setShowComments] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isLiking, setIsLiking] = useState(false);
+
+  useEffect(() => {
+    setReacted(post.reactedByMe ?? false);
+  }, [post.reactedByMe]);
+
+  useEffect(() => {
+    setReactionCount(post.reactionCount ?? 0);
+  }, [post.reactionCount]);
 
   async function toggleReaction() {
+    if (isLiking) return;
+    setIsLiking(true);
     setReacted((r) => !r);
     setReactionCount((c) => (reacted ? c - 1 : c + 1));
     try {
@@ -27,6 +38,8 @@ export default function PostCard({ post, currentUserId, isAdmin, onDeleted }) {
       // revert on failure
       setReacted((r) => !r);
       setReactionCount((c) => (reacted ? c + 1 : c - 1));
+    } finally {
+      setIsLiking(false);
     }
   }
 

@@ -30,7 +30,7 @@ exports.deletePost = async (req, res, next) => {
 
 exports.getTripFeed = async (req, res, next) => {
   try {
-    const posts = await feedService.getTripFeed(req.params.tripId, req.query);
+    const posts = await feedService.getTripFeed(req.params.tripId, { ...req.query, currentUserId: req.user.id });
     res.status(200).json({ data: posts });
   } catch (err) {
     next(err);
@@ -39,7 +39,7 @@ exports.getTripFeed = async (req, res, next) => {
 
 exports.getAllFeed = async (req, res, next) => {
   try {
-    const posts = await feedService.getAllFeed(req.query);
+    const posts = await feedService.getAllFeed({ ...req.query, currentUserId: req.user.id });
     res.status(200).json({ data: posts });
   } catch (err) {
     next(err);

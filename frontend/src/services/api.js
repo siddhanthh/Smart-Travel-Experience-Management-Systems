@@ -1,8 +1,13 @@
 import axios from 'axios';
 
-// Backend base URL. JWT is stored as an httpOnly cookie by the server,
-// so we don't attach an Authorization header — withCredentials sends the cookie.
-const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const getBaseURL = () => {
+  if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
+  // Fallback dynamically to current host IP/localhost for local mobile testing
+  const hostname = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
+  return `http://${hostname}:5000/api`;
+};
+
+const baseURL = getBaseURL();
 
 const api = axios.create({
   baseURL,

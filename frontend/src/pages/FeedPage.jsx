@@ -51,15 +51,17 @@ export default function FeedPage() {
           </Link>
         </div>
       )}
-      <h1 className="text-2xl font-bold text-slate-900">
-        {tripId ? (
-          <>Feed {trip && <span className="text-base font-normal text-slate-500">· {trip.title}</span>}</>
-        ) : (
-          'Collective Activity Feed'
-        )}
-      </h1>
+      <div className="flex items-center justify-between gap-4 flex-wrap">
+        <h1 className="text-2xl font-bold text-slate-900">
+          {tripId ? (
+            <>Feed {trip && <span className="text-base font-normal text-slate-500">· {trip.title}</span>}</>
+          ) : (
+            'Collective Activity Feed'
+          )}
+        </h1>
+        <CreatePost tripId={tripId} onPosted={load} />
+      </div>
       <ErrorMessage message={error} />
-      <CreatePost tripId={tripId} onPosted={load} />
       {loading ? (
         <LoadingSpinner />
       ) : (
