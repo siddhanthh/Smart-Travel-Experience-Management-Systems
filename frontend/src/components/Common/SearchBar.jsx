@@ -1,7 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-export default function SearchBar({ placeholder = 'Search…', onSearch }) {
-  const [value, setValue] = useState('');
+export default function SearchBar({ placeholder = 'Search…', onSearch, initialValue = '' }) {
+  const [value, setValue] = useState(initialValue);
+
+  useEffect(() => {
+    setValue(initialValue);
+  }, [initialValue]);
 
   function handleSubmit(e) {
     e.preventDefault();

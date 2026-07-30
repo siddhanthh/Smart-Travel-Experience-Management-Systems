@@ -1,13 +1,25 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { searchService } from '../services/searchService';
 import SearchBar from '../components/Common/SearchBar';
 import TripList from '../components/Trips/TripList';
 import LoadingSpinner from '../components/Common/LoadingSpinner';
 
 export default function SearchPage() {
+  const [searchParams] = useSearchParams();
+  const initialQuery = searchParams.get('q') || '';
+  
   const [mode, setMode] = useState('trips');
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (initialQuery) {
+      handleSearch(initialQuery);
+    } else {
+      setResults(null);
+    }
+  }, [initialQuery, mode]);
 
   async function handleSearch(q) {
     if (!q) return setResults(null);
@@ -43,6 +55,7 @@ export default function SearchPage() {
       <SearchBar
         placeholder={mode === 'trips' ? 'Search by title or destination…' : 'Search by name or email…'}
         onSearch={handleSearch}
+        initialValue={initialQuery}
       />
 
       {loading && <LoadingSpinner />}

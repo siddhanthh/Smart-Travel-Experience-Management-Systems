@@ -40,9 +40,7 @@ export default function Navbar() {
           </Link>
           {user && (
             <div className="flex items-center gap-4 sm:gap-6 overflow-x-auto sm:overflow-visible pb-1 sm:pb-0 scrollbar-hide">
-              <NavLink to="/dashboard" className={linkClass}>
-                Dashboard
-              </NavLink>
+
               <NavLink to="/feed" className={linkClass}>
                 Feed
               </NavLink>
