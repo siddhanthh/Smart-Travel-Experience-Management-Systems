@@ -19,6 +19,9 @@ export function AuthProvider({ children }) {
 
   const login = useCallback(async (credentials) => {
     const data = await authService.login(credentials);
+    if (data.token) {
+      localStorage.setItem('token', data.token);
+    }
     setUser(data.data ?? data.user ?? data);
     return data;
   }, []);
@@ -33,6 +36,7 @@ export function AuthProvider({ children }) {
     try {
       await authService.logout();
     } finally {
+      localStorage.removeItem('token');
       setUser(null);
     }
   }, []);

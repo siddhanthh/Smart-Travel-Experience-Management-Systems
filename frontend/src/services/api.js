@@ -12,6 +12,14 @@ const api = axios.create({
   },
 });
 
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 // Central error handling: normalize error message shape so components
 // can just do `catch(err) { setError(err.message) }`
 api.interceptors.response.use(
