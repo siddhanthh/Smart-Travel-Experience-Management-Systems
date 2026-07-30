@@ -19,6 +19,18 @@ exports.createPost = async ({ tripId, userId, content, files }) => {
   return post;
 };
 
+exports.deletePost = async (postId) => {
+  const post = await Post.findById(postId);
+  if (!post) throw new AppError('Post not found', 404);
+  
+  // Optional: delete associated comments and reactions (skip for brevity or implement if needed)
+  await Comment.deleteMany({ postId: post._id });
+  await Reaction.deleteMany({ postId: post._id });
+  
+  await Post.findByIdAndDelete(postId);
+  return { message: 'Post deleted successfully' };
+};
+
 // MongoDB Aggregation Pipeline to join comments and reactions
 exports.getTripFeed = async (tripId, { page = 1, limit = 10 }) => {
   const skip = (Number(page) - 1) * Number(limit);

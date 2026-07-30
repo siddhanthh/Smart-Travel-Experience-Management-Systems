@@ -19,6 +19,15 @@ exports.createPost = async (req, res, next) => {
   }
 };
 
+exports.deletePost = async (req, res, next) => {
+  try {
+    const result = await feedService.deletePost(req.params.postId);
+    res.status(200).json(result);
+  } catch (err) {
+    next(err);
+  }
+};
+
 exports.getTripFeed = async (req, res, next) => {
   try {
     const posts = await feedService.getTripFeed(req.params.tripId, req.query);

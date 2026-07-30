@@ -106,6 +106,26 @@ router.post('/posts/:postId/comments', validate(createCommentSchema), feedContro
 
 /**
  * @openapi
+ * /feed/posts/{postId}:
+ *   delete:
+ *     summary: Delete a post
+ *     tags: [Feed]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: postId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Post deleted successfully
+ */
+router.delete('/posts/:postId', feedController.deletePost);
+
+/**
+ * @openapi
  * /feed/posts/{postId}/reactions:
  *   post:
  *     summary: Toggle reaction/like on a post
