@@ -33,13 +33,13 @@ export default function Navbar() {
 
   return (
     <nav className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-        <div className="flex items-center gap-8">
-          <Link to="/" className="text-xl font-extrabold text-blue-600 tracking-tight">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between px-4 py-3 gap-y-3">
+        <div className="flex items-center gap-4 sm:gap-8 w-full sm:w-auto">
+          <Link to="/" className="text-xl font-extrabold text-blue-600 tracking-tight shrink-0">
             STEMS
           </Link>
           {user && (
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-4 sm:gap-6 overflow-x-auto pb-1 sm:pb-0 scrollbar-hide flex-1">
               <NavLink to="/dashboard" className={linkClass}>
                 Dashboard
               </NavLink>

@@ -88,12 +88,13 @@ export default function PostCard({ post, currentUserId, isAdmin, onDeleted }) {
       <div className="mt-3 flex items-center gap-4 text-xs text-slate-500">
         <button
           onClick={toggleReaction}
-          className={`rounded-lg border px-3 py-1 font-semibold transition ${
-            reacted
-              ? 'border-blue-200 bg-blue-50 text-blue-600'
-              : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+          className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
+            reacted ? 'bg-blue-50 text-blue-600 hover:bg-blue-100' : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
           }`}
         >
+          <svg className="h-4 w-4" fill={reacted ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
+          </svg>
           {reacted ? 'Liked' : 'Like'} ({reactionCount})
         </button>
         <button
