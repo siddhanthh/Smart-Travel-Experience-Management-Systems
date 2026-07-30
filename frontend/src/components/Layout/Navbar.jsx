@@ -49,9 +49,7 @@ export default function Navbar() {
               <NavLink to="/trips" className={linkClass}>
                 Trips
               </NavLink>
-              <NavLink to="/search" className={linkClass}>
-                Search
-              </NavLink>
+
               <NavLink to="/notifications" className={({ isActive }) => `relative ${linkClass({ isActive })}`}>
                 Notifications
                 {unread > 0 && (
@@ -69,7 +67,28 @@ export default function Navbar() {
           )}
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
+          {user && (
+            <form 
+              onSubmit={(e) => {
+                e.preventDefault();
+                const q = e.target.q.value;
+                if (q) navigate(`/search?q=${encodeURIComponent(q)}`);
+              }}
+              className="relative"
+            >
+              <svg className="absolute left-2.5 top-1.5 sm:top-2 h-4 w-4 text-slate-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="M21 21l-4.35-4.35"></path>
+              </svg>
+              <input 
+                name="q"
+                type="text"
+                placeholder="Search..."
+                className="w-24 rounded-full border border-slate-300 bg-slate-50 py-1 sm:py-1.5 pl-8 pr-3 text-xs sm:text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all sm:w-48 sm:focus:w-64"
+              />
+            </form>
+          )}
           {user ? (
             <>
               <span className="hidden text-sm font-medium text-slate-700 sm:inline">
@@ -77,7 +96,7 @@ export default function Navbar() {
               </span>
               <button
                 onClick={handleLogout}
-                className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition"
+                className="cursor-pointer rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition"
               >
                 Logout
               </button>

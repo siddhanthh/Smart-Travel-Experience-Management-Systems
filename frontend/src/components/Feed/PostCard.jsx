@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { feedService } from '../../services/feedService';
 import CommentSection from './CommentSection';
+import ConfirmModal from '../Common/ConfirmModal';
 
 const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '');
 
@@ -15,6 +16,7 @@ export default function PostCard({ post, currentUserId, isAdmin, onDeleted }) {
   const [reactionCount, setReactionCount] = useState(post.reactionCount ?? 0);
   const [comments, setComments] = useState(post.comments ?? []);
   const [showComments, setShowComments] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   async function toggleReaction() {
     setReacted((r) => !r);
@@ -28,9 +30,9 @@ export default function PostCard({ post, currentUserId, isAdmin, onDeleted }) {
     }
   }
 
-  async function handleDelete() {
-    if (!confirm('Delete this post?')) return;
+  async function confirmDelete() {
     await feedService.deletePost(post._id || post.id);
+    setShowDeleteModal(false);
     onDeleted?.(post._id || post.id);
   }
 
@@ -57,7 +59,7 @@ export default function PostCard({ post, currentUserId, isAdmin, onDeleted }) {
           </div>
         </div>
         {canDelete && (
-          <button onClick={handleDelete} className="text-xs font-medium text-red-500 hover:underline">
+          <button onClick={() => setShowDeleteModal(true)} className="cursor-pointer text-xs font-medium text-red-500 hover:underline">
             Delete
           </button>
         )}
@@ -111,6 +113,13 @@ export default function PostCard({ post, currentUserId, isAdmin, onDeleted }) {
           onCommentAdded={(c) => setComments((prev) => [...prev, c])}
         />
       )}
+      <ConfirmModal
+        isOpen={showDeleteModal}
+        title="Delete Post"
+        message="Are you sure you want to delete this post? This action cannot be undone."
+        onConfirm={confirmDelete}
+        onCancel={() => setShowDeleteModal(false)}
+      />
     </div>
   );
 }

@@ -50,7 +50,7 @@ export default function LoginForm() {
       </div>
       <button
         disabled={loading}
-        className="w-full rounded-lg bg-blue-600 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
+        className="cursor-pointer w-full rounded-lg bg-blue-600 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
       >
         {loading ? 'Logging in…' : 'Log in'}
       </button>

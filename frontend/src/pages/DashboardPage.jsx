@@ -44,10 +44,10 @@ export default function DashboardPage() {
   if (loading) return <LoadingSpinner label="Loading your dashboard…" />;
 
   return (
-    <div className="space-y-6">
+    <div className="w-full max-w-full overflow-x-hidden space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Welcome back, {user?.name}</h1>
+          <h1 className="text-2xl font-bold text-slate-900 break-words">Welcome, {user?.name}</h1>
           <p className="text-sm text-slate-500">
             Smart Travel Experience Management System Dashboard
           </p>
@@ -86,17 +86,7 @@ export default function DashboardPage() {
         </Link>
       </div>
 
-      <div className="flex flex-wrap gap-3">
-        <Link to="/feed" className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 shadow-sm">
-          Explore Feed
-        </Link>
-        <Link to="/trips" className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 shadow-sm">
-          Browse Trips
-        </Link>
-        <Link to="/notifications" className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 shadow-sm">
-          Notifications ({unread})
-        </Link>
-      </div>
+
 
       <div>
         <h2 className="mb-3 text-lg font-semibold text-slate-900">Your trips</h2>

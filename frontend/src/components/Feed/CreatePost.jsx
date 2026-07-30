@@ -73,6 +73,24 @@ export default function CreatePost({ tripId: propTripId, onPosted }) {
         placeholder="Share a photo or memory from your trip..."
         className="w-full resize-none rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
       />
+      
+      {images.length > 0 && (
+        <div className="mt-3 flex gap-2 overflow-x-auto pb-2">
+          {images.map((img, i) => (
+            <div key={i} className="relative shrink-0">
+              <img src={URL.createObjectURL(img)} className="h-20 w-20 object-cover rounded-lg border border-slate-200" alt="Preview" />
+              <button 
+                type="button"
+                onClick={() => setImages(images.filter((_, idx) => idx !== i))}
+                className="cursor-pointer absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-slate-900/60 text-xs text-white hover:bg-slate-900 transition"
+              >
+                &times;
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
         <div>
           <input
@@ -80,7 +98,7 @@ export default function CreatePost({ tripId: propTripId, onPosted }) {
             type="file"
             multiple
             accept="image/*"
-            onChange={(e) => setImages(Array.from(e.target.files))}
+            onChange={(e) => setImages([...images, ...Array.from(e.target.files)])}
             className="hidden"
           />
           <label htmlFor="imageUpload" className="flex items-center gap-1.5 cursor-pointer rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition">
@@ -89,12 +107,12 @@ export default function CreatePost({ tripId: propTripId, onPosted }) {
               <circle cx="8.5" cy="8.5" r="1.5"></circle>
               <polyline points="21 15 16 10 5 21"></polyline>
             </svg>
-            {images.length > 0 ? `${images.length} file(s) selected` : 'Choose Photos'}
+            Add Photos
           </label>
         </div>
         <button
-          disabled={loading}
-          className="rounded-lg bg-blue-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
+          disabled={loading || (!content.trim() && images.length === 0)}
+          className="cursor-pointer rounded-lg bg-blue-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
         >
           {loading ? 'Posting…' : 'Post'}
         </button>
