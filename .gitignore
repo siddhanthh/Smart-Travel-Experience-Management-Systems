@@ -26,5 +26,9 @@ npm-debug.log*
 
 # ── Coverage reports ──
 coverage/
+
+BACKEND_DOCUMENTATION.md
+FRONTEND_DOCUMENTATION.md
 IMPLEMENTATION_PLAN.md
-frontend_changes_summary.md
+.postman/
+postman
