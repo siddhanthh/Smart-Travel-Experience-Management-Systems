@@ -25,7 +25,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(morgan('dev'));
 app.use(cors({
-  origin: 'http://localhost:5173', // Vite default port
+  origin: 'https://stems-ruby.vercel.app/', // Vite default port
   credentials: true
 }));
 
