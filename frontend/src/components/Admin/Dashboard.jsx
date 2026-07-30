@@ -20,7 +20,7 @@ export default function Dashboard({ stats }) {
     },
     {
       label: 'Platform Volume',
-      value: stats?.revenue != null ? `₹${Number(stats.revenue).toLocaleString('en-IN')}` : '—',
+      value: stats?.totalExpenseVolume != null ? `₹${Number(stats.totalExpenseVolume).toLocaleString('en-IN')}` : '—',
       color: 'border-l-4 border-amber-500',
       note: 'Total booking transaction value',
     },
