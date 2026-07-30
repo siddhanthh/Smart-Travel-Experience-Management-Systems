@@ -39,33 +39,39 @@ exports.createTrip = async (tripData, userId) => {
   }
 };
 
-exports.getTrips = async ({ page = 1, limit = 10, destination, status, search }) => {
-  const offset = (page - 1) * limit;
-  let query = 'SELECT * FROM trips WHERE 1=1';
+exports.getTrips = async ({ page = 1, limit = 10, destination, status, search, mine, userId }) => {
+  const offset = (Number(page) - 1) * Number(limit);
+  let whereClause = ' WHERE 1=1';
   const queryParams = [];
 
   if (destination) {
-    query += ' AND destination LIKE ?';
+    whereClause += ' AND t.destination LIKE ?';
     queryParams.push(`%${destination}%`);
   }
   if (status) {
-    query += ' AND status = ?';
+    whereClause += ' AND t.status = ?';
     queryParams.push(status);
   }
   if (search) {
-    query += ' AND (title LIKE ? OR description LIKE ?)';
+    whereClause += ' AND (t.title LIKE ? OR t.description LIKE ?)';
     queryParams.push(`%${search}%`, `%${search}%`);
   }
+  if (mine && userId) {
+    whereClause += ' AND (t.created_by = ? OR EXISTS (SELECT 1 FROM trip_members tm WHERE tm.trip_id = t.id AND tm.user_id = ?))';
+    queryParams.push(userId, userId);
+  }
 
-  // Count total matching records for pagination metadata
-  const countQuery = query.replace('SELECT *', 'SELECT COUNT(*) as total');
-  const [countRows] = await pool.query(countQuery, queryParams);
+  const [countRows] = await pool.query(`SELECT COUNT(*) as total FROM trips t ${whereClause}`, queryParams);
   const total = countRows[0].total;
 
-  query += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
-  queryParams.push(Number(limit), Number(offset));
-
-  const [trips] = await pool.query(query, queryParams);
+  const dataQuery = `
+    SELECT t.*, (SELECT COUNT(*) FROM trip_members tm WHERE tm.trip_id = t.id) as member_count
+    FROM trips t
+    ${whereClause}
+    ORDER BY t.created_at DESC
+    LIMIT ? OFFSET ?
+  `;
+  const [trips] = await pool.query(dataQuery, [...queryParams, Number(limit), offset]);
 
   return {
     data: trips,
@@ -182,4 +188,68 @@ exports.cancelTrip = async (tripId, userId, userRole) => {
   } finally {
     connection.release();
   }
+};
+
+exports.getTripMembers = async (tripId) => {
+  const [members] = await pool.query(
+    `SELECT tm.id, tm.user_id, tm.role, tm.joined_at, u.name, u.email
+     FROM trip_members tm
+     JOIN users u ON tm.user_id = u.id
+     WHERE tm.trip_id = ?`,
+    [tripId]
+  );
+  return { members };
+};
+
+exports.updateTrip = async (tripId, tripData, userId, userRole) => {
+  const [trips] = await pool.query('SELECT created_by FROM trips WHERE id = ?', [tripId]);
+  if (trips.length === 0) throw new AppError('Trip not found', 404);
+  if (trips[0].created_by !== userId && userRole !== 'admin') {
+    throw new AppError('Unauthorized to update this trip', 403);
+  }
+
+  const { title, description, destination, start_date, end_date, max_members, status } = tripData;
+  await pool.query(
+    `UPDATE trips SET
+       title = COALESCE(?, title),
+       description = COALESCE(?, description),
+       destination = COALESCE(?, destination),
+       start_date = COALESCE(?, start_date),
+       end_date = COALESCE(?, end_date),
+       max_members = COALESCE(?, max_members),
+       status = COALESCE(?, status)
+     WHERE id = ?`,
+    [title, description, destination, start_date, end_date, max_members, status, tripId]
+  );
+  return { message: 'Trip updated successfully' };
+};
+
+exports.deleteTrip = async (tripId, userId, userRole) => {
+  const [trips] = await pool.query('SELECT created_by FROM trips WHERE id = ?', [tripId]);
+  if (trips.length === 0) throw new AppError('Trip not found', 404);
+  if (trips[0].created_by !== userId && userRole !== 'admin') {
+    throw new AppError('Unauthorized to delete this trip', 403);
+  }
+  await pool.query('DELETE FROM trips WHERE id = ?', [tripId]);
+  return { message: 'Trip deleted successfully' };
+};
+
+exports.leaveTrip = async (tripId, userId) => {
+  const [trips] = await pool.query('SELECT created_by FROM trips WHERE id = ?', [tripId]);
+  if (trips.length === 0) throw new AppError('Trip not found', 404);
+
+  if (Number(trips[0].created_by) === Number(userId)) {
+    throw new AppError('The trip organizer cannot leave the trip. You can cancel or delete the trip instead.', 400);
+  }
+
+  const [result] = await pool.query(
+    'DELETE FROM trip_members WHERE trip_id = ? AND user_id = ?',
+    [tripId, userId]
+  );
+
+  if (result.affectedRows === 0) {
+    throw new AppError('You are not a member of this trip.', 400);
+  }
+
+  return { message: 'Successfully left the trip' };
 };
