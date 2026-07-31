@@ -41,6 +41,36 @@ STEMS/
 └── README.md
 ```
 
+## Database Schema
+
+STEMS employs a dual-database architecture, using MySQL for structured transactional data and MongoDB for flexible social and logging activities.
+
+### Schema Relationships Diagram
+
+![Database Schema Diagram](./database/schema_diagram.png)
+
+### Relational Schema (MySQL)
+
+We structure relational tables inside MySQL with foreign keys, cascaded deletes, indexes, and unique compound constraints to guarantee ACID safety:
+
+1. **users**: Login credentials, user display names, and roles (admin, user).
+2. **trips**: Group trip itineraries with titles, capacities, dates, and status codes.
+3. **trip_members**: Junction table connecting users to trips. Prevents duplicate joins.
+4. **bookings**: Accommodation, flight, and transport trackers. Enforces a compound unique constraint to block duplicate bookings.
+5. **expenses**: Shared purchases paid by group members.
+6. **expense_splits**: Individual split items showing how much each member owes for a given expense.
+7. **settlements**: Payments made between trip members to balance outstanding debt sheets.
+
+### Document Schemas (MongoDB)
+
+Our NoSQL collections track high-volume social activity, alert systems, and security footprints:
+
+* **posts**: Trip-scoped social feed updates (accepts text and variable arrays of image URLs).
+* **comments**: Text replies mapped to posts with author references.
+* **reactions**: Post likes. Unique compound indexes { postId: 1, userId: 1 } prevent double-likes.
+* **notifications**: User alert channels. Uses a unique idempotencyKey index (type:userId:referenceId) to block duplicate notification spams.
+* **audit_logs**: System administration audit trails logging exact API calls, changes (before and after), IP addresses, and user-agents.
+
 ## Getting Started
 
 ### Prerequisites
@@ -77,7 +107,7 @@ STEMS/
 
 - **Frontend**: Deployed on Vercel
 - **Backend**: Deployed on Render
-- **Relational Data**: MySQL Database
+- **Relational Data**: Deployed on Railway (MySQL Database)
 - **Document Data**: MongoDB Atlas Cluster
 
 

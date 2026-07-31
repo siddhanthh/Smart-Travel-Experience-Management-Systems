@@ -11,8 +11,8 @@ const options = {
     },
     servers: [
       {
-        url: 'http://localhost:5000/api',
-        description: 'Development Server'
+        url: 'https://stems-backend.onrender.com/api',
+        description: 'Production Server'
       }
     ],
     components: {
